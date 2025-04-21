@@ -1,49 +1,70 @@
-from queue import PriorityQueue
+# lrta_star.py
+from typing import List
+from sokoban.moves import *   # pentru constantele LEFT, RIGHT, BOX_LEFT, ...
 
-def manhattan_heuristic(state):
+# ---------------------------------------------------------------
+#  EURISTICĂ Manhattan simplă (fără player)
+# ---------------------------------------------------------------
+def manhattan_heuristic(state) -> int:
     """
-    Calculează suma celor mai mici distanțe Manhattan între cutii și ținte.
+    Suma distanţelor Manhattan de la fiecare cutie la cel mai apropiat target.
     """
     total = 0
-    box_positions = list(state.positions_of_boxes.keys())  # [(x, y), ...]
     goals = list(state.targets)
-
+    boxes = list(state.positions_of_boxes.keys())
     remaining_goals = goals.copy()
-    for box in box_positions:
+
+    for box in boxes:
         dists = [abs(box[0] - g[0]) + abs(box[1] - g[1]) for g in remaining_goals]
-        min_dist = min(dists)
-        total += min_dist
-        remaining_goals.pop(dists.index(min_dist))
+        best = min(dists)
+        total += best
+        remaining_goals.pop(dists.index(best))  # elimin ţinta folosită
 
     return total
 
-def lrta_star_solver(start_map):
+
+# ---------------------------------------------------------------
+#  LRTA* care întoarce LISTA DE MUTĂRI reale
+# ---------------------------------------------------------------
+def lrta_star_solver(start_map) -> List[int]:
+    """
+    Implementare LRTA*:
+      - H: dicţionar <Map, h(n)>
+      - path: listă de mutări (constante din moves.py)
+    """
     H = {}
     current = start_map.copy()
-    path = []
-    visited = set()
+    path: List[int] = []
 
     while not current.is_solved():
-        visited.add(current)
+        # Iniţializez h pentru starea curentă
+        if str(current) not in H:
+            H[str(current)] = manhattan_heuristic(current)
 
-        if current not in H:
-            H[current] = manhattan_heuristic(current)
-
-        min_cost = float('inf')
+        best_cost = float("inf")
         best_successor = None
         best_action = None
 
-        for succ in current.get_neighbours():  # succ = Map (already copied)
-            if succ not in H:
-                H[succ] = manhattan_heuristic(succ)
+        # Generez mutările valabile
+        for move in current.filter_possible_moves():
+            succ = current.copy()
+            succ.apply_move(move)
 
-            cost = 1 + H[succ]
-            if cost < min_cost:
-                min_cost = cost
+            key = str(succ)
+            if key not in H:
+                H[key] = manhattan_heuristic(succ)
+
+            cost = 1 + H[key]          # c(n, a) = 1 + h(succesor)
+            if cost < best_cost:
+                best_cost = cost
                 best_successor = succ
+                best_action = move
 
-        H[current] = min_cost
+        # Actualizez estimarea pentru starea curentă
+        H[str(current)] = best_cost
+
+        # Avansez
+        path.append(best_action)
         current = best_successor
-        path.append("step")  # opțional, poți salva și acțiunea dacă `get_neighbours()` le returnează
 
     return path

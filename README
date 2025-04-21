@@ -1,0 +1,2 @@
+Facem pairing cu cea mai apropiata tinta pentru ca e o euristica Greedy care incearca sa asocieze cutiile cu tintele cele mai apropiate. La Beam Search pornim de la starea initiala 
+si generam toate starile vecine, nivelul urmator. Le sortam dupa g + h, unde g(n) = cat am mers pana aici si h(n) = cat mai avem de mers. Pastram doar beam_width cele mai bune. 
