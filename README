@@ -1,2 +1,28 @@
 Facem pairing cu cea mai apropiata tinta pentru ca e o euristica Greedy care incearca sa asocieze cutiile cu tintele cele mai apropiate. La Beam Search pornim de la starea initiala 
 si generam toate starile vecine, nivelul urmator. Le sortam dupa g + h, unde g(n) = cat am mers pana aici si h(n) = cat mai avem de mers. Pastram doar beam_width cele mai bune. 
+Diferente intre algoritmi initial, cu euristica cu distanta Manhattan
+tip de cautare: BS: extinde toata generatia curenta apoi alege cele mai bune k succesoare
+LRTA: se muta imediat, rescrie din mers
+memorie: BS: pastreaza la fiecare nivel maximum beam_width stari, adica k candidiati, 
+LRTA: tine minte doar starea curenta si un dictionar H pt euristica
+strategie: BS alege succesorii cu f = g + h cele mai mici apoi taie restul.
+LRTA: alege succestorul cu 1 + h minim
+Astfel, am inceput rezolvarea temei folosind ca euristica distanta Manhattan deoarece este simplu de implementat si inteles, dar și 
+potrivită pentru grile ortogonale precum cele din Sokoban. Distanța Manhattan estimează costul minim de deplasare al unei cutii
+până la o țintă, fără a lua în calcul obstacolele sau constrângerile impuse de celelalte cutii sau de poziția jucătorului.
+Pentru testul medium_map2.yaml, am observat comportamente diferite în funcție de algoritm. Beam Search, care funcționează offline
+și evaluează global generații de stări, a reușit să găsească soluția în doar 9 niveluri, demonstrând eficiența euristicii în 
+identificarea rapidă a unei căi optime, cu beam_width=60, suficient de larg. La testul large_map2 insa parcurgerea nu se realizeaza
+in timpul cerut de 5 minute. Cautam deci o imbunatatire viitoare. 
+În schimb, LRTA*, care acționează online și actualizează euristica din mers, a executat 17 mutări până la rezolvare. 
+Analizând traseul parcurs de LRTA*, am observat că algoritmul a oscilat temporar în jurul cutiei, ceea ce a dus la o creștere 
+a numărului de pași. Acest comportament se explică prin faptul că LRTA* învață H treptat și local, fără să aibă o viziune globală 
+asupra planului.
+Am luat în considerare modificarea euristicii pentru a penaliza cutiile deja plasate pe target sau pentru a include distanța dintre
+jucător și cea mai apropiată cutie. Totuși, pentru acest test, am păstrat varianta Manhattan de bază, care s-a dovedit suficientă pentru Beam Search,
+dar mai puțin stabilă pentru LRTA*.
+
+Dupa modificarea euristicii Manhattan simpla am implementat una imbunatatita in urma analizei testului large_map2 care imi depasea cele 5
+minute. astfel noua eursitica reduce costul dacă o cutie e deja pe un target;
+minimizează mișcările în plus adăugând distanța playerului la cutii
+prioritizează mutarea cutiilor utile, nu pe toate. Deci pentru rularea testului large2 de beam search am un timp de 0.431 secunde. 
