@@ -5,12 +5,10 @@ from sokoban.gif import save_images, create_gif
 import time
 
 if __name__ == "__main__":
-    crt_map = Map.from_yaml("tests/medium_map2.yaml")
+    crt_map = Map.from_yaml("tests/large_map2.yaml")
     print("=== Harta inițială ===")
     print(crt_map)
-    print("Rezolvată deja?:", crt_map.is_solved())
 
-    #RULARE  BEAM  SEARCH
     print("\n=== RULEZ BEAM SEARCH ===")
     start_time = time.time()
     path_states = beam_search_solver(
@@ -40,12 +38,9 @@ if __name__ == "__main__":
         print("Beam Search nu a găsit soluție în condițiile date.")
 
 
-    # ==========================================================
-#                RULARE  LRTA*
-# ==========================================================
     print("\n=== RULEZ LRTA* ===")
 
-    start_map_lrta = Map.from_yaml("tests/easy_map2.yaml")
+    start_map_lrta = Map.from_yaml("tests/medium_map2.yaml")
     start_time = time.time()
 
     moves_lrta = lrta_star_solver(start_map_lrta)              # listă de mutări

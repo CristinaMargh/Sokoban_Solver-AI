@@ -1,12 +1,4 @@
-Facem pairing cu cea mai apropiata tinta pentru ca e o euristica Greedy care incearca sa asocieze cutiile cu tintele cele mai apropiate. La Beam Search pornim de la starea initiala 
-si generam toate starile vecine, nivelul urmator. Le sortam dupa g + h, unde g(n) = cat am mers pana aici si h(n) = cat mai avem de mers. Pastram doar beam_width cele mai bune. 
-Diferente intre algoritmi initial, cu euristica cu distanta Manhattan
-tip de cautare: BS: extinde toata generatia curenta apoi alege cele mai bune k succesoare
-LRTA: se muta imediat, rescrie din mers
-memorie: BS: pastreaza la fiecare nivel maximum beam_width stari, adica k candidiati, 
-LRTA: tine minte doar starea curenta si un dictionar H pt euristica
-strategie: BS alege succesorii cu f = g + h cele mai mici apoi taie restul.
-LRTA: alege succestorul cu 1 + h minim
+
 Astfel, am inceput rezolvarea temei folosind ca euristica distanta Manhattan deoarece este simplu de implementat si inteles, dar și 
 potrivită pentru grile ortogonale precum cele din Sokoban. Distanța Manhattan estimează costul minim de deplasare al unei cutii
 până la o țintă, fără a lua în calcul obstacolele sau constrângerile impuse de celelalte cutii sau de poziția jucătorului.
@@ -21,8 +13,39 @@ asupra planului.
 Am luat în considerare modificarea euristicii pentru a penaliza cutiile deja plasate pe target sau pentru a include distanța dintre
 jucător și cea mai apropiată cutie. Totuși, pentru acest test, am păstrat varianta Manhattan de bază, care s-a dovedit suficientă pentru Beam Search,
 dar mai puțin stabilă pentru LRTA*.
+Facem pairing cu cea mai apropiata tinta pentru ca e o euristica Greedy care incearca sa asocieze cutiile cu tintele cele mai apropiate. La Beam Search pornim de la starea initiala 
+si generam toate starile vecine, nivelul urmator. Le sortam dupa g + h, unde g(n) = cat am mers pana aici si h(n) = cat mai avem de mers. Pastram doar beam_width cele mai bune. 
+Diferente intre algoritmi initial, cu euristica cu distanta Manhattan
+tip de cautare: BS: extinde toata generatia curenta apoi alege cele mai bune k succesoare
+LRTA: se muta imediat, rescrie din mers
+memorie: BS: pastreaza la fiecare nivel maximum beam_width stari, adica k candidiati, 
+LRTA: tine minte doar starea curenta si un dictionar H pt euristica
+strategie: BS alege succesorii cu f = g + h cele mai mici apoi taie restul.
+LRTA: alege succestorul cu 1 + h minim
 
 Dupa modificarea euristicii Manhattan simpla am implementat una imbunatatita in urma analizei testului large_map2 care imi depasea cele 5
 minute. astfel noua eursitica reduce costul dacă o cutie e deja pe un target;
 minimizează mișcările în plus adăugând distanța playerului la cutii
 prioritizează mutarea cutiilor utile, nu pe toate. Deci pentru rularea testului large2 de beam search am un timp de 0.431 secunde. 
+
+Pentru o estimare mai realistă, am experimentat și cu o euristică BFS, care în loc să estimeze distanțele dintre cutii și 
+ținte prin Manhattan, calculează distanțele minime reale printr-un algoritm BFS de la fiecare cutie la cel mai apropiat target.
+Această abordare:
+Ține cont de obstacole reale (nu doar de poziție), evitând situații în care o cutie pare aproape de un target, 
+dar de fapt este blocată.Permite o explorare mai eficientă în hărți complexe, reducând numărul de stări inutile generate.
+
+Optimizari specifice problemei:
+-LRTA :Ignoră cutiile deja pe target.
+Calculează distanța BFS de la cutii rămase la cele mai apropiate targeturi (ținând cont de pereți).
+Adaugă distanța Manhattan de la player la cea mai apropiată cutie ce trebuie mutată.
+Penalizează mișcările de tip pull folosind undo_moves.
+- Beam Search ✔️ Recunoaște că unele cutii sunt deja corect plasate, deci nu trebuie mutate => eficiență crescută.
+
+✔️ Înțelege că playerul trebuie să ajungă la cutie înainte s-o mute => realist.
+
+Comparatii intre cei 2 algoritmi: Pentru a face acest lucru am ales ca test de referinta super_hard_map1 si o sa folosesc aceeasi
+euristica pentru amandoi, bfs_distance.    
+- timp de executie: LRTA 0.290 cu 517 mutari si 13 pull. beam 1.103 sec, 39 niveluri si 13 pull
+
+Am realizat 2 grafice pentru euristica Manhattan atat pentru Beam search cat si
+pentru LRTA_star pentru toate testele. 
