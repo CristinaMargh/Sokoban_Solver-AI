@@ -25,10 +25,10 @@ This project focuses on implementing and analyzing heuristic search algorithms f
 - Improved heuristics significantly reduced time on complex maps
 - LRTA\* performed well on small maps but showed higher oscillation and pull moves on complex maps.
 
-## 🛠️ Tech & Skills
+## Tech & Skills
 - **Language:** Python  
 - **Concepts:** Heuristic search, pathfinding, state-space representation, incremental learning  
 - **Skills gained:** Algorithm optimization, heuristic design, performance analysis, AI problem-solving  
 
-## 📌 Conclusion
+## Conclusion
 This project highlights the trade-offs between offline search strategies like Beam Search and online learning approaches like LRTA\*. By designing better heuristics and optimizations, Sokoban instances of increasing difficulty can be solved more efficiently.
